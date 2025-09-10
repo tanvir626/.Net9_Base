@@ -195,43 +195,40 @@ namespace CoreAuth.Controllers
 
 
 
+        //[HttpGet]
+        //public IActionResult VerifyEmail()
+        //{
+        //    return View();
+        //}
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> VerifyEmail(VerifyEmailViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    var user = await userManager.FindByNameAsync(model.Email);
+
+        //    if (user == null)
+        //    {
+        //        ModelState.AddModelError("", "User not found!");
+        //        return View(model);
+        //    }
+        //    else
+        //    {
+        //        return RedirectToAction("ChangePassword", "Account", new { username = user.UserName });
+        //    }
+        //}
+
         [HttpGet]
-        public IActionResult VerifyEmail()
+        public async Task<IActionResult> ChangePassword(string username)
         {
-            return View();
-        }
+            var user = await userManager.GetUserAsync(User);
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> VerifyEmail(VerifyEmailViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var user = await userManager.FindByNameAsync(model.Email);
-
-            if (user == null)
-            {
-                ModelState.AddModelError("", "User not found!");
-                return View(model);
-            }
-            else
-            {
-                return RedirectToAction("ChangePassword", "Account", new { username = user.UserName });
-            }
-        }
-
-        [HttpGet]
-        public IActionResult ChangePassword(string username)
-        {
-            if (string.IsNullOrEmpty(username))
-            {
-                return RedirectToAction("VerifyEmail", "Account");
-            }
-
-            return View(new ChangePasswordViewModel { Email = username });
+            return View(new ChangePasswordViewModel { Email = user.Email });
         }
 
         [HttpPost]
