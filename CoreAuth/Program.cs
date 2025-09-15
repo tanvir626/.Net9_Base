@@ -1,10 +1,21 @@
 using CoreAuth.Data;
 using CoreAuth.Models;
+using CoreAuth.Repository.Implementation;
+using CoreAuth.Repository.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+//0. Injections
+builder.Services.AddScoped<IPageController, Im_PageController>();
+
+
+
+
 
 // 1?? Database connection
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")

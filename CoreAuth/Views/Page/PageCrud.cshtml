@@ -1,0 +1,169 @@
+﻿@model CoreAuth.Models.VM_Model.VM_PageCrud
+<div class="card">
+    <div class="card-header">
+        Page
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col offset-10 text-center">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    Add Page
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped" id="myTable">
+                    <thead>
+                        <tr>
+                            <th scope="col">Role</th>
+                            <th scope="col">PagePath</th>
+                            <th scope="col">View</th>
+                            <th scope="col">Create</th>
+                            <th scope="col">Edit</th>
+                            <th scope="col">Delete</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Mark</td>
+                            <td>Otto</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Jacob</td>
+                            <td>Thornton</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td colspan="2">Larry the Bird</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+    <!--Add Page Modal-->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Page</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="Create" method="post" id="pageForm">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="CategoriesID" class="form-label"></label>
+                            <select asp-for="CategoriesID" class="form-select" asp-items="ViewBag.Controller">
+                                <option value="">-- Select Controller --</option>
+                            </select>
+                            <span asp-validation-for="SubCategoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SubCategoryId" class="form-label"></label>
+                            <select asp-for="SubCategoryId" class="form-select" asp-items="ViewBag.Method">
+                                <option value="">-- Select Action --</option>
+                            </select>
+                            <span asp-validation-for="SubCategoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RoleId" class="form-label"></label>
+                            <select asp-for="RoleId" class="form-select" asp-items="ViewBag.RoleId">
+                                <option value="">-- Select Role --</option>
+                            </select>
+                            <span asp-validation-for="RoleId" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-check">
+                                    <input asp-for="CanView" class="form-check-input" type="checkbox" />
+                                    <label asp-for="CanView" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-check">
+                                    <input asp-for="CanCreate" class="form-check-input" type="checkbox" />
+                                    <label asp-for="CanCreate" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-check">
+                                    <input asp-for="CanDelete" class="form-check-input" type="checkbox" />
+                                    <label asp-for="CanDelete" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-check">
+                                    <input asp-for="CanEdit" class="form-check-input" type="checkbox" />
+                                    <label asp-for="CanEdit" class="form-check-label"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-plus-circle"></i> Create
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section CustomJS {
+    <script>
+        $(document).ready(function () {
+            // Init DataTable
+            var table = $('#myTable').DataTable();
+
+            // Handle form submit via AJAX
+            $("#pageForm").on("submit", function (e) {
+                e.preventDefault(); // prevent normal form submit
+
+                $("#loadingSpinner").show(); // show loader
+
+                $.ajax({
+                    url: '@Url.Action("Create", "Page")', // Controller Action
+                    type: "POST",
+                    data: $(this).serialize(), // send form data
+                    success: function (response) {
+                        if(response.info)
+                        {
+                        $("#loadingSpinner").hide(); // hide loader
+                        $('#exampleModal').modal('hide'); // close modal
+                        table.ajax.reload();
+                        toastr.success("Successfully Done");
+                        }
+                        else
+                        {
+                            toastr.error("Something Went Wrong");
+                        }
+
+                    },
+                    error: function (xhr) {
+                        $("#loadingSpinner").hide();
+                        alert("Error occurred: " + xhr.responseText);
+                    }
+                });
+            });
+
+        });
+    </script>
+}
+

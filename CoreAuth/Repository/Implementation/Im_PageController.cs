@@ -1,0 +1,128 @@
+﻿using CoreAuth.Models.DropDown;
+using CoreAuth.Models.VM_Model;
+using CoreAuth.Repository.Interface;
+using Dapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
+
+namespace CoreAuth.Repository.Implementation
+{
+    public class Im_PageController(IConfiguration con): IPageController
+    {
+        readonly private string con = con.GetConnectionString("DefaultConnection");
+        public List<SelectListItem> Get_DDPage_Role()
+        {
+            using (var connection = new SqlConnection(con))
+            {
+                string sql = @"SELECT Id, Name FROM AspNetRoles";
+
+                var roles = connection.Query<DD_Page_Role>(sql).ToList();
+
+                // Map to SelectListItem inside the method
+                var selectList = roles.Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.Name
+                }).ToList();
+
+                return selectList;
+            }
+        }
+
+        public List<SelectListItem> Get_DDPage_Action()
+        {
+            using (var connection = new SqlConnection(con))
+            {
+                string sql = @"SELECT Id, SubCateName FROM SubCategories";
+
+                var Methods = connection.Query<DD_Page_Method>(sql).ToList();
+
+                // Map to SelectListItem inside the method
+                var selectList = Methods.Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.SubCateName
+                }).ToList();
+
+                return selectList;
+            }
+        }
+
+        public List<SelectListItem> Get_DDPage_Controller()
+        {
+            using (var connection = new SqlConnection(con))
+            {
+                string sql = @"SELECT Id, CateName FROM Categories";
+
+                var Methods = connection.Query<DD_Page_Controller>(sql).ToList();
+
+                // Map to SelectListItem inside the method
+                var selectList = Methods.Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.CateName
+                }).ToList();
+
+                return selectList;
+            }
+        }
+
+        public bool Save_to_RolePermission(VM_PageCrud model)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    string sql = @"
+                            INSERT INTO [CoreDB].[dbo].[RolePermissions]
+                            (
+                                RoleId,
+                                SubCategoryId,
+                                CanView,
+                                CanCreate,
+                                CanEdit,
+                                CanDelete,
+                                CreateDate,
+                                UpdateDate,
+                                CategoriesID
+                            )
+                            VALUES
+                            (
+                                @RoleId,
+                                @SubCategoryId,
+                                @CanView,
+                                @CanCreate,
+                                @CanEdit,
+                                @CanDelete,
+                                @CreateDate,
+                                @UpdateDate,
+                                @CategoriesID
+                            )";
+
+                    // Dapper parameter binding
+                    var rowsAffected = connection.Execute(sql, new
+                    {
+                        model.RoleId,
+                        model.SubCategoryId,
+                        model.CanView,
+                        model.CanCreate,
+                        model.CanEdit,
+                        model.CanDelete,
+                        CreateDate = DateTime.Now,
+                        UpdateDate = DateTime.Now,
+                        model.CategoriesID
+                    });
+
+                    return true;
+                }
+
+            }
+            catch (Exception ex) 
+            { 
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            
+        }
+    }
+}
