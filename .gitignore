@@ -2,3 +2,5 @@
 /.vs
 /CoreAuth/obj
 /CoreAuth/obj
+/CoreAuth/bin
+bin

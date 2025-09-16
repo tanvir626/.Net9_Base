@@ -27,6 +27,7 @@
 
     <!--Toastr-->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
 </head>
 
 <body class="sb-nav-fixed">
@@ -286,6 +287,23 @@
 
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script>
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "3000",
+            "extendedTimeOut": "1000",
+            "showDuration": "300",
+            "hideDuration": "1000"
+        };
+
+        // Boost z-index so toastr shows above modal
+        toastr.options.escapeHtml = true;
+        toastr.options.newestOnTop = true;
+
+    </script>
+
 
     <!-- Other scripts -->
     <script src="~/js/scripts.js"></script>
