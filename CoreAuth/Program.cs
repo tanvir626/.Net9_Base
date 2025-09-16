@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 //0. Injections
 builder.Services.AddScoped<IPageController, Im_PageController>();
+builder.Services.AddScoped<Icrud, Im_Crud>();
 
 
 

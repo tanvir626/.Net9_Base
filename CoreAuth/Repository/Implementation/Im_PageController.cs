@@ -1,4 +1,5 @@
 ﻿using CoreAuth.Models.DropDown;
+using CoreAuth.Models.Table;
 using CoreAuth.Models.VM_Model;
 using CoreAuth.Repository.Interface;
 using Dapper;
@@ -10,6 +11,7 @@ namespace CoreAuth.Repository.Implementation
     public class Im_PageController(IConfiguration con): IPageController
     {
         readonly private string con = con.GetConnectionString("DefaultConnection");
+
         public List<SelectListItem> Get_DDPage_Role()
         {
             using (var connection = new SqlConnection(con))
@@ -124,5 +126,41 @@ namespace CoreAuth.Repository.Implementation
             }
             
         }
+
+        public List<Table_RolePermission> Get_RolePermissions()
+        {
+            try
+            {
+                using (var connection = new SqlConnection(con))
+                {
+                    string sql = @"
+                SELECT 
+                    rp.Id AS Id,
+                    r.Name AS RoleName,
+                    sc.SubCateName AS Method,
+                    c.CateName AS Controller,
+                    CASE WHEN rp.CanView = 1 THEN 'Y' ELSE 'N' END AS CanView,
+                    CASE WHEN rp.CanCreate = 1 THEN 'Y' ELSE 'N' END AS CanCreate,
+                    CASE WHEN rp.CanEdit = 1 THEN 'Y' ELSE 'N' END AS CanEdit,
+                    CASE WHEN rp.CanDelete = 1 THEN 'Y' ELSE 'N' END AS CanDelete,
+                    rp.CreateDate,
+                    rp.UpdateDate
+                FROM RolePermissions rp
+                INNER JOIN SubCategories sc ON sc.Id = rp.SubCategoryId
+                INNER JOIN Categories c ON c.Id = rp.CategoriesID
+                INNER JOIN AspNetRoles r ON r.Id = rp.RoleId";
+
+                    var data = connection.Query<Table_RolePermission>(sql).ToList();
+
+                    return data;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return new List<Table_RolePermission>();
+            }
+        }
+
     }
 }
