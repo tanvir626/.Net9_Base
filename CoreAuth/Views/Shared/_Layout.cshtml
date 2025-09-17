@@ -303,7 +303,26 @@
         toastr.options.newestOnTop = true;
 
     </script>
+    <script>
+           $.ajaxSetup({
+            beforeSend: function () {
+                $("#loadingSpinner").hide();
+            },
+            complete: function () {
+                $("#loadingSpinner").hide();
+            },
+            error: function (xhr) {
+                $("#loadingSpinner").hide();
+                toastr.error("Error occurred: " + xhr.responseText);
+            }
+        });
 
+        // Optional: global success handler
+        $(document).ajaxSuccess(function () {
+            $("#loadingSpinner").hide();
+        });
+
+    </script>
 
     <!-- Other scripts -->
     <script src="~/js/scripts.js"></script>
@@ -316,6 +335,12 @@
 
     @RenderSection("CustomJS", required: false)
 
+    <!--Datatable-->
+    <script>
+                 new DataTable('#myTable', {
+            order: [[0, 'desc']]
+        });
+    </script>
 </body>
 </html>
 

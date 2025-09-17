@@ -5,6 +5,7 @@ using CoreAuth.Repository.Interface;
 using Dapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace CoreAuth.Repository.Implementation
 {
@@ -73,51 +74,57 @@ namespace CoreAuth.Repository.Implementation
         {
             try
             {
-                using (var connection = new SqlConnection(con))
-                {
-                    string sql = @"
-                            INSERT INTO [CoreDB].[dbo].[RolePermissions]
-                            (
-                                RoleId,
-                                SubCategoryId,
-                                CanView,
-                                CanCreate,
-                                CanEdit,
-                                CanDelete,
-                                CreateDate,
-                                UpdateDate,
-                                CategoriesID
-                            )
-                            VALUES
-                            (
-                                @RoleId,
-                                @SubCategoryId,
-                                @CanView,
-                                @CanCreate,
-                                @CanEdit,
-                                @CanDelete,
-                                @CreateDate,
-                                @UpdateDate,
-                                @CategoriesID
-                            )";
-
-                    // Dapper parameter binding
-                    var rowsAffected = connection.Execute(sql, new
+                    using (var connection = new SqlConnection(con))
                     {
-                        model.RoleId,
-                        model.SubCategoryId,
-                        model.CanView,
-                        model.CanCreate,
-                        model.CanEdit,
-                        model.CanDelete,
-                        CreateDate = DateTime.Now,
-                        UpdateDate = DateTime.Now,
-                        model.CategoriesID
-                    });
+                    string sql = @"
+                                INSERT INTO [CoreDB].[dbo].[RolePermissions]
+                                (
+                                    RoleId,
+                                    SubCategoryId,
+                                    CanView,
+                                    CanCreate,
+                                    CanEdit,
+                                    CanDelete,
+                                    CreateDate,
+                                    UpdateDate,
+                                    CategoriesID
+                                )
+                                SELECT 
+                                    @RoleId,
+                                    @SubCategoryId,
+                                    @CanView,
+                                    @CanCreate,
+                                    @CanEdit,
+                                    @CanDelete,
+                                    @CreateDate,
+                                    @UpdateDate,
+                                    @CategoriesID
+                                WHERE NOT EXISTS (
+                                    SELECT 1
+                                    FROM [CoreDB].[dbo].[RolePermissions]
+                                    WHERE RoleId = @RoleId
+                                      AND SubCategoryId = @SubCategoryId
+                                      AND CategoriesID = @CategoriesID
+                                );
+                            ";
 
-                    return true;
-                }
-
+                        // Dapper parameter binding
+                        var rowsAffected = connection.Execute(sql, new
+                        {
+                            model.RoleId,
+                            model.SubCategoryId,
+                            model.CanView,
+                            model.CanCreate,
+                            model.CanEdit,
+                            model.CanDelete,
+                            CreateDate = DateTime.Now,
+                            UpdateDate = DateTime.Now,
+                            model.CategoriesID
+                        });
+                        if (rowsAffected > 0)
+                            return true;
+                        return false;
+                    }
             }
             catch (Exception ex) 
             { 

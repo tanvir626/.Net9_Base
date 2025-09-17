@@ -19,6 +19,7 @@
                 <table class="table table-striped border border-2" id="myTable" >
                     <thead class="border border-2">
                         <tr>
+                            <th scope="col" class="text-center">Id</th>
                             <th scope="col" class="text-center">Role</th>
                             <th scope="col" class="text-center">Controller</th>
                             <th scope="col" class="text-center">Method</th>
@@ -33,6 +34,7 @@
                         @foreach (var d in ViewBag.Data)
                         {
                             <tr>
+                                <td class="text-center">@d.Id</td>
                                 <td class="text-center">@d.RoleName</td>
                                 <td class ="text-center">@d.Controller</td>
                                 <td class ="text-center">@d.Method</td>
@@ -41,7 +43,7 @@
                                 <td class="text-center">@d.CanEdit</td>
                                 <td class="text-center">@d.CanDelete</td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-primary" onclick="return Edit(@d.Id)">Edit</button>
+                                    <button class="btn btn-sm btn-primary" onclick="return ShowindividualRow('RolePermissions','Id',@d.Id)">Edit</button>
                                     <button class="btn btn-sm btn-danger" onclick="return Delete('RolePermissions','Id',@d.Id)">Delete</button>
                                 </td>
                             </tr>
@@ -51,6 +53,7 @@
             </div>
         </div>
     </div>
+
     <!--Add Page Modal-->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -126,13 +129,86 @@
         </div>
     </div>
     <!--End Page Modal-->
+
+    <!--Edit Page Modal-->
+    <div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="EditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form asp-action="Update" method="post" id="EditpageForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="EditModalLabel">Edit Page</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="CategoriesID" class="form-label"></label>
+                            <select asp-for="CategoriesID" id="EditCategoriesID" class="form-select" asp-items="ViewBag.Controller">
+                                <option value="">-- Select Controller --</option>
+                            </select>
+                            <span asp-validation-for="SubCategoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SubCategoryId" class="form-label"></label>
+                            <select asp-for="SubCategoryId" id="EditSubCategoryId" class="form-select" asp-items="ViewBag.Method">
+                                <option value="">-- Select Action --</option>
+                            </select>
+                            <span asp-validation-for="SubCategoryId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="RoleId" class="form-label"></label>
+                            <select asp-for="RoleId" id="EditRoleId" class="form-select" asp-items="ViewBag.RoleId">
+                                <option value="">-- Select Role --</option>
+                            </select>
+                            <span asp-validation-for="RoleId" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-3">
+                                <div class="form-check">
+                                    <input asp-for="CanView" id="EditCanView" class="form-check-input" type="checkbox" />
+                                    <label asp-for="CanView" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-check">
+                                    <input asp-for="CanCreate" id="EditCanCreate" class="form-check-input" type="checkbox" />
+                                    <label asp-for="CanCreate" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-check">
+                                    <input asp-for="CanDelete" id="EditCanDelete" class="form-check-input" type="checkbox" />
+                                    <label asp-for="CanDelete" class="form-check-label"></label>
+                                </div>
+                            </div>
+                            <div class="col-3">
+                                <div class="form-check">
+                                    <input asp-for="CanEdit" id="EditCanEdit" class="form-check-input" type="checkbox" />
+                                    <label asp-for="CanEdit" class="form-check-label"></label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success"> <i class="bi bi-plus-circle"></i> Create </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Edit Page Modal-->
 </div>
 @section CustomJS {
     <script>
         $(document).ready(function () {
-            // Init DataTable
-            var table = $('#myTable').DataTable();
-
             // Handle form submit via AJAX
             $("#pageForm").on("submit", function (e) {
                 e.preventDefault(); // prevent normal form submit
@@ -149,15 +225,13 @@
                         toastr.success("Successfully Done");
                         $("#loadingSpinner").hide(); // hide loader
                         $('#exampleModal').modal('hide'); // close modal
-                        table.ajax.reload();
-                      
+                         window.location.reload();                     
                         }
                         else
                         {
                              $('#exampleModal').modal('hide');
                              $("#loadingSpinner").hide();
-                            toastr.error("Something Went Wrong");
-
+                            toastr.error("Same Data Exists");
                         }
 
                     },
@@ -168,9 +242,48 @@
                 });
             });
         });
-        function Edit(id)
+
+        function ShowindividualRow(TableName,ColName,id)
         {
-           alert(id);
+           if (!confirm("Are you sure you want to delete this row?"))
+                return;
+                             
+            $.ajax({
+                    url: '@Url.Action("ShowIndivisualRow", "Page")', 
+                    type: "GET",
+                    data: { TableName:TableName,ColName:ColName,id: id }, 
+                    success: function (response) {
+                        $('#EditModal').modal('show');
+                     response.forEach(function(row) {
+                        $('#EditCategoriesID').val(row["CategoriesID"]).trigger('change');
+                        $('#EditSubCategoryId').val(row["SubCategoryId"]).trigger('change');
+                        $('#EditRoleId').val(row["RoleId"]).trigger('change');
+                        $('#EditCanCreate').prop('checked', row["CanCreate"]);
+                        $('#EditCanView').prop('checked', row["CanView"]);
+                        $('#EditCanDelete').prop('checked', row["CanDelete"]);
+                        $('#EditCanEdit').prop('checked', row["CanEdit"]);
+
+                     });
+
+            
+                        if(response.info)
+                        {
+                            toastr.success("Successfully Deleted");
+                            $("#loadingSpinner").hide(); 
+                            window.location.reload()
+                        }
+                        else
+                        {
+                             $("#loadingSpinner").hide();
+                            toastr.error("Something Went Wrong");
+                        }
+
+                    },
+                    error: function (xhr) {
+                        $("#loadingSpinner").hide();
+                        alert("Error occurred: " + xhr.responseText);
+                    }
+                });
         }
 
         function Delete(TableName,ColName,id)
@@ -180,14 +293,14 @@
               
             $("#loadingSpinner").show();
             $.ajax({
-                    url: '@Url.Action("Delete", "Page")', // Controller Action
+                    url: '@Url.Action("Delete", "Page")',
                     type: "POST",
-                    data: { TableName:TableName,ColName:ColName,id: id }, // send form data
+                    data: { TableName:TableName,ColName:ColName,id: id }, 
                     success: function (response) {
                         if(response.info)
                         {
                             toastr.success("Successfully Deleted");
-                            $("#loadingSpinner").hide(); // hide loader
+                            $("#loadingSpinner").hide(); 
                             window.location.reload()
                         }
                         else

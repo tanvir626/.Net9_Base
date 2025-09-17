@@ -1,7 +1,9 @@
-﻿using CoreAuth.Models.VM_Model;
+﻿using CoreAuth.Models.Table;
+using CoreAuth.Models.VM_Model;
 using CoreAuth.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace CoreAuth.Controllers
 {
@@ -60,6 +62,21 @@ namespace CoreAuth.Controllers
                 bool status =cd.Delete(TableName, ColName,id);
 
                 return Json(new { info = status });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { info = false, message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public JsonResult ShowIndivisualRow(string TableName,string ColName,string Id)
+        {
+            try
+            {
+                var row = cd.ShowIndivisualRow(TableName, ColName, Id);
+
+                return Json(row);
             }
             catch (Exception ex)
             {
