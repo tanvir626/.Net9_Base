@@ -3,21 +3,22 @@ using Microsoft.AspNetCore.Mvc;
 using CoreAuth.Models;
 using CoreAuth.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoreAuth.Controllers
 {
     public class AccountController : Controller
-    {
+    {       
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
-
         public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
-            this.roleManager = roleManager;
+              this.roleManager = roleManager;
         }
+
 
         [HttpGet]
         public IActionResult Login()
@@ -102,6 +103,7 @@ namespace CoreAuth.Controllers
         //}
 
         [HttpGet]
+        [Route("User/User List/")]
         public IActionResult UsetList()
         {
             // Load roles from AspNetRoles table
@@ -110,6 +112,7 @@ namespace CoreAuth.Controllers
         }
 
         [HttpGet]
+        [Route("User/Add User/")]
         public IActionResult Register()
         {
             // Load roles from AspNetRoles table
@@ -128,6 +131,7 @@ namespace CoreAuth.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Route("User/Add User/")]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (!ModelState.IsValid)

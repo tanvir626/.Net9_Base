@@ -6,16 +6,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace CoreAuth.Repository.Implementation
 {
-    public class Im_Crud(IConfiguration con) : Icrud
+    public class Im_Crud(IDapper con) : Icrud
     {
-        readonly private string con = con.GetConnectionString("DefaultConnection");
         public bool Delete(string tableName, string colName, string id)
         {
             try
             {
                 int.TryParse(id, out int parsedId);
                 
-                using (var connection = new SqlConnection(con))
+                using (var connection = new SqlConnection(con.Dappercon()))
                 {
                     string sql = $@"DELETE FROM [{tableName}] WHERE [{colName}] = @Id";
 
@@ -37,7 +36,7 @@ namespace CoreAuth.Repository.Implementation
             try
             {
 
-                using (var connection = new SqlConnection(con))
+                using (var connection = new SqlConnection(con.Dappercon()))
                 {
                     string sql = $@"
                 SELECT * 

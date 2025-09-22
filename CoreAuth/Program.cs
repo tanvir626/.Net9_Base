@@ -3,6 +3,7 @@ using CoreAuth.Models;
 using CoreAuth.Repository.Implementation;
 using CoreAuth.Repository.Interface;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 //0. Injections
 builder.Services.AddScoped<IPageController, Im_PageController>();
 builder.Services.AddScoped<Icrud, Im_Crud>();
+builder.Services.AddScoped<IDapper, Im_Dapper>();
 
 
 

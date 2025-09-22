@@ -9,7 +9,7 @@ namespace CoreAuth.Controllers
 {
     public class PageController(IPageController page, Icrud cd) : Controller
     {
-        [Route("/page/")]
+        [Route("/Basic Setup/Page Access")]
         public IActionResult PageCrud()
         {
             GetDropDownList();
@@ -50,6 +50,30 @@ namespace CoreAuth.Controllers
             return RedirectToAction("Error500");
         }
 
+
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdatePage(VM_PageCrud model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    bool status = page.Update_to_RolePermission(model);
+                    return Json(new
+                    {
+                        info = status
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return RedirectToAction("Error500");
+        }
+
         [Route("/500/")]
         public IActionResult Error500()=>View();
 
@@ -75,8 +99,10 @@ namespace CoreAuth.Controllers
             try
             {
                 var row = cd.ShowIndivisualRow(TableName, ColName, Id);
+                string RoleName = page.RoleNameByID(Id);
+                string PageLink = page.PageLinkById(Id);
 
-                return Json(row);
+                return Json(new { row , RoleName , PageLink ,Info=true});
             }
             catch (Exception ex)
             {

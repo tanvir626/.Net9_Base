@@ -10,6 +10,7 @@ using CoreAuth.Models.ModelClass;
 
 namespace CoreAuth.Controllers
 {
+
     public class SubCategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +21,7 @@ namespace CoreAuth.Controllers
         }
 
         // GET: SubCategories
+        [Route("/Basic Setup/Sub-Menu/")]
         public async Task<IActionResult> Index()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "CateName");

@@ -37,6 +37,13 @@ namespace CoreAuth.Models.VM_Model
         public DateTime UpdateDate { get; set; }
 
         [Required]
-        public string ActionName { get; set; }
+        public string? ActionName { get; set; }
+
+        [Required]
+        public string? Createdby { get; set; }
+
+        [Required]
+        public string? Editedby { get; set; }
+
     }
 }
