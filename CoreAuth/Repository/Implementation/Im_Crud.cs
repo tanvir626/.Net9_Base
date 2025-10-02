@@ -53,5 +53,48 @@ namespace CoreAuth.Repository.Implementation
                 return new List<dynamic>();
             }
         }
+        public List<dynamic> GetTableData(string TableName)
+{
+    try
+    {
+        using (var connection = new SqlConnection(con.Dappercon()))
+        {
+            string sql = $@"SELECT * FROM [{TableName}]";
+            var data = connection.Query(sql).ToList();
+            return data;
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+        return new List<dynamic>();
+    }
+}
+
+
+public List<SelectListItem> GetDDTableData(string tableName, string idCol, string valueCol)
+{
+    using (var connection = new SqlConnection(con.Dappercon()))
+    {
+      
+        string sql =
+            $"SELECT [{idCol}] AS Id, [{valueCol}] AS Val FROM [{tableName}]";
+
+        var rows = connection.Query(sql)
+                             .Select(r => new {
+                                 Id = (object)r.Id,   
+                                 Val = (string)r.Val  
+                             })
+                             .ToList();
+
+        var selectList = rows.Select(r => new SelectListItem
+        {
+            Value = r.Id.ToString(),
+            Text = r.Val
+        }).ToList();
+
+        return selectList;
+    }
+}
     }
 }
