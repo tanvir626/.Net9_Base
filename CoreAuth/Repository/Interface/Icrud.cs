@@ -6,5 +6,7 @@ namespace CoreAuth.Repository.Interface
     {
       public bool Delete(string TableName, string ColName, string Id);
       public List<dynamic> ShowIndivisualRow(string TableName, string ColName, string Id);
+      public List<dynamic> GetTableData(string TableName);
+      public List<SelectListItem> GetDDTableData(string TableName, string idcol, string Valucol);
     }
 }
